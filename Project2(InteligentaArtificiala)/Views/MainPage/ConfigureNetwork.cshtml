@@ -1,0 +1,476 @@
+﻿@model List<InputModelView>
+<div style="position: fixed; left: 0; top: 0; height: 100%; width: 800px; background-color: #f5f5f5; padding: 40px; overflow-y: auto;">
+    <h2 style="font-size: 48px;">Configure Network</h2>
+    <form method="post" asp-action="Update">
+        <button type="submit">Update</button>
+
+        @for (int layerIndex = 0; layerIndex < Project2_InteligentaArtificiala_.Models.LayerModelView.Layer.Count; layerIndex++)
+    {
+        var neuronList = Project2_InteligentaArtificiala_.Models.LayerModelView.Layer[layerIndex];
+
+        <div style="margin-bottom: 40px;">
+            @if (layerIndex == 0)
+            {
+                <h3 style="font-size: 20px;color : darkred">INPUT LAYER</h3>
+            }
+            else if (layerIndex == Project2_InteligentaArtificiala_.Models.LayerModelView.Layer.Count - 1)
+            {
+                <h3 style="font-size: 20px;color : darkred">OUTPUT LAYER</h3>
+            }
+            else
+            {
+                <h3 style="font-size: 20px;color : darkred">Layer @layerIndex</h3>
+            }
+                <div style="display: flex; flex-direction: row;">
+
+                    @for (int neuronIndex = 0; neuronIndex < neuronList.Count; neuronIndex++)
+                    {
+                        var neuron = neuronList[neuronIndex];
+
+                        <div style="margin-right: 20px;">
+                            <div style="margin-right: 20px;">
+                                <button type="button" class="neuron-button" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">Neuron @neuronIndex</button>
+                            </div>
+                            @if (layerIndex == 0)
+                            {
+                                <label style="font-size: 18px; margin-bottom: 10px;">x: <span data-field="x" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex" style="font-size: 18px;">@neuron.x</span></label>
+                                <br>
+                                <button type="button" class="increment-button" style="font-size: 18px; background-color: green; color: white;" data-field="x" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">+</button>
+                                <button type="button" class="decrement-button" style="font-size: 18px; background-color: red; color: white;" data-field="x" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">-</button>
+                                <label style="font-size: 18px; margin-top: 10px; margin-bottom: 10px;">w: <span data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex" style="font-size: 18px;">@neuron.w</span></label>
+
+                                <br>
+                                <button type="button" class="increment-button" style="font-size: 18px; background-color: green; color: white;" data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">+</button>
+                                <button type="button" class="decrement-button" style="font-size: 18px; background-color: red; color: white;" data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">-</button>
+                            }
+                            @if (layerIndex > 0)
+                            {
+                                <label style="font-size: 18px; margin-bottom: 10px;">x: <span data-field="x" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex" style="font-size: 18px;">@neuron.x</span></label>
+                                <br>
+                                <label style="font-size: 18px; margin-top: 10px; margin-bottom: 10px;">w: <span data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex" style="font-size: 18px;">@neuron.w</span></label>
+
+                                <br>
+                                <button type="button" class="increment-button" style="font-size: 18px; background-color: green; color: white;" data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">+</button>
+                                <button type="button" class="decrement-button" style="font-size: 18px; background-color: red; color: white;" data-field="w" data-layerIndex="@layerIndex" data-neuronIndex="@neuronIndex">-</button>
+                            }
+
+                            <input type="hidden" name="neurons[@layerIndex][@neuronIndex].Id" value="@neuron.Id" />
+                            <input type="hidden" name="neurons[@layerIndex][@neuronIndex].x" value="@neuron.x" />
+                            <input type="hidden" name="neurons[@layerIndex][@neuronIndex].w" value="@neuron.w" />
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </form>
+
+</div>
+<div style="position: fixed; right: 0; top: 0; height: 100%; width: 700px; background-color: #EEEEEE; padding: 40px; overflow-y: auto;">
+<div id="ginResult" style="text-align: center; margin-top: 10px;">
+    <p><strong style="font-size: 1.2em;">GIN Result:</strong> <span id="ginResultValue" style="font-size: 1.2em; color: red;">@ViewBag.GINResult</span></p>
+</div>
+
+<div style="text-align: center; margin-top: 20px;">
+    <form method="post" asp-action="CalculateGIN" asp-route-operation="SUM" style="display: inline;">
+        <input type="hidden" id="hiddenLayerIndex" name="layerIndex" value="0" />
+        <input type="hidden" id="hiddenNeuronIndex" name="neuronIndex" value="0" />
+        <button type="submit">SUM</button>
+    </form>
+    <form method="post" asp-action="CalculateGIN" asp-route-operation="PROD" style="display: inline;">
+        <input type="hidden" id="hiddenLayerIndex" name="layerIndex" value="0" />
+        <input type="hidden" id="hiddenNeuronIndex" name="neuronIndex" value="0" />
+        <button type="submit">PROD</button>
+    </form>
+
+    <form method="post" asp-action="CalculateGIN" asp-route-operation="MAX" style="display: inline;">
+    <input type="hidden" id="hiddenLayerIndex" name="layerIndex" value="0" />
+    <input type="hidden" id="hiddenNeuronIndex" name="neuronIndex" value="0" />
+    <button type="submit">MAX</button>
+</form>
+
+<form method="post" asp-action="CalculateGIN" asp-route-operation="MIN" style="display: inline;">
+    <input type="hidden" id="hiddenLayerIndex" name="layerIndex" value="0" />
+    <input type="hidden" id="hiddenNeuronIndex" name="neuronIndex" value="0" />
+    <button type="submit">MIN</button>
+</form>
+</div>
+<p style="margin-bottom: 70px;">
+    <form method="post" asp-action="UpdateAGTheta">
+        <div style="text-align: center; margin-top: 20px;">
+            <label>a: <span id="aValue">@NeuronModelView.a</span></label>
+            <button type="button" class="incrementt-button" style="background-color: green; color: white;" data-field="a">+</button>
+            <button type="button" class="decrementt-button" style="background-color: red; color: white;" data-field="a">-</button>
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+
+            <label>g: <span id="gValue">@NeuronModelView.g</span></label>
+            <button type="button" class="incrementt-button" style="background-color: green; color: white;" data-field="g">+</button>
+            <button type="button" class="decrementt-button" style="background-color: red; color: white;" data-field="g">-</button>
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+
+            <label>theta: <span id="thetaValue">@NeuronModelView.theta</span></label>
+            <button type="button" class="incrementt-button" style="background-color: green; color: white;" data-field="theta">+</button>
+            <button type="button" class="decrementt-button" style="background-color: red; color: white;" data-field="theta">-</button>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+            <button type="submit">Update</button>
+            <span style="margin-left: 10px;">set the values for a,g or/and theta</span>
+        </div>
+
+
+    </form>
+
+
+    <div style="text-align: center; margin-top: 20px;">
+        <p>
+            <strong style="font-size: 1.2em;">Activation:</strong>
+            <span id="activationValue" style="font-size: 1.2em; color: red;">
+                @if (ViewBag.Activation != null)
+                {
+                    var formattedActivation = ((double)ViewBag.Activation).ToString("F20");
+                    double parsedActivation;
+                    if (double.TryParse(formattedActivation, out parsedActivation))
+                    {
+                        if (parsedActivation == (int)parsedActivation)
+                        {
+                            <text>@parsedActivation.ToString("F0")</text>
+                        }
+                        else
+                        {
+                            <text>@formattedActivation</text>
+                        }
+                    }
+                    else
+                    {
+                        <text>@formattedActivation</text>
+                    }
+                }
+            </span>
+        </p>
+    </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <form method="post" asp-action="CalculateOutputResult" style="display: inline-block; margin-right: 10px;">
+                <button type="submit">BINAR</button>
+            </form>
+            <form method="post" asp-action="ShowFloatOutputResult" style="display: inline-block;">
+                <button type="submit">FLOAT</button>
+                @if (ViewBag.OutputResult != null)
+                {
+                    var formattedOutput = ((double)ViewBag.OutputResult).ToString("F20");
+                    double parsedOutput;
+                    if (double.TryParse(formattedOutput, out parsedOutput))
+                    {
+                        if (parsedOutput == (int)parsedOutput)
+                        {
+                            ViewBag.OutputResult = parsedOutput;
+                        }
+                        else
+                        {
+                            ViewBag.OutputResult = formattedOutput;
+                        }
+                    }
+                    else
+                    {
+                        ViewBag.OutputResult = formattedOutput;
+                    }
+                }
+            </form>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <p><strong style="font-size: 1.5em;">Output Result:</strong> <span id="activationValue" style="font-size: 1.2em; color: red;">@ViewBag.OutputResult</span></p>
+            </div>
+        </div>
+
+
+    <div style="text-align:leftt; margin-top: 20px; margin-left : 33%">
+        <form method="post" asp-action="CalculateActivation" asp-route-function="Step">
+            <div class="button-wrapper">
+                <button type="submit" class="activation-button">Step</button>
+                <span class="parameter-text">Parameters: None</span>
+            </div>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+        </form>
+
+        <form method="post" asp-action="CalculateActivation" asp-route-function="Sigmoid">
+            <div class="button-wrapper">
+                <button type="submit" class="activation-button">Sigmoid</button>
+                <span class="parameter-text">Parameters: g, theta</span>
+            </div>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+        </form>
+
+        <form method="post" asp-action="CalculateActivation" asp-route-function="Sign">
+            <div class="button-wrapper">
+                <button type="submit" class="activation-button">Sign</button>
+                <span class="parameter-text">Parameters: None</span>
+            </div>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+        </form>
+
+        <form method="post" asp-action="CalculateActivation" asp-route-function="Tanh">
+            <div class="button-wrapper">
+                <button type="submit" class="activation-button">Tanh</button>
+                <span class="parameter-text">Parameters: g, theta</span>
+            </div>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+        </form>
+
+        <form method="post" asp-action="CalculateActivation" asp-route-function="LinearRamp">
+            <div class="button-wrapper">
+                <button type="submit" class="activation-button">Linear Ramp</button>
+                <span class="parameter-text">Parameters: a</span>
+            </div>
+            <input type="hidden" id="thetaInput" name="theta" value="@NeuronModelView.theta">
+            <input type="hidden" id="gInput" name="g" value="@NeuronModelView.g">
+            <input type="hidden" id="aInput" name="a" value="@NeuronModelView.a">
+        </form>
+    </div>
+
+
+
+    </div>
+
+
+
+<style>
+    .neuron-button {
+        margin: 5px;
+        padding: 10px 20px;
+        font-size: 18px;
+    }
+</style>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const incrementButtons = document.querySelectorAll(".increment-button");
+        const decrementButtons = document.querySelectorAll(".decrement-button");
+
+       incrementButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const field = button.getAttribute("data-field");
+            const layerIndex = button.getAttribute("data-layerIndex");
+            const neuronIndex = button.getAttribute("data-neuronIndex");
+            const span = document.querySelector(`[data-field="${field}"][data-layerIndex="${layerIndex}"][data-neuronIndex="${neuronIndex}"]`);
+            let currentValue = parseFloat(span.textContent.replace(',', '.')) || 0;
+            currentValue += 0.01;
+            const newValue = currentValue.toFixed(2).replace('.', ',');
+            span.textContent = newValue;
+            updateHiddenInput(field, layerIndex, neuronIndex, currentValue);
+        });
+    });
+
+        decrementButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const field = button.getAttribute("data-field");
+                const layerIndex = button.getAttribute("data-layerIndex");
+                const neuronIndex = button.getAttribute("data-neuronIndex");
+                const span = document.querySelector(`[data-field="${field}"][data-layerIndex="${layerIndex}"][data-neuronIndex="${neuronIndex}"]`);
+                let currentValue = parseFloat(span.textContent.replace(',', '.')) || 0;
+                currentValue -= 0.01;
+                const newValue = currentValue.toFixed(2).replace('.', ',');
+                span.textContent = newValue;
+                updateHiddenInput(field, layerIndex, neuronIndex, currentValue);
+            });
+        });
+
+        function updateHiddenInput(field, layerIndex, neuronIndex, value) {
+        const inputX = document.querySelector(`input[name="neurons[${layerIndex}][${neuronIndex}].x"]`);
+        const inputW = document.querySelector(`input[name="neurons[${layerIndex}][${neuronIndex}].w"]`);
+        inputX.value = field === 'x' ? value : inputX.value;
+        inputW.value = field === 'w' ? value : inputW.value;
+    }
+
+        const neuronButtons = document.querySelectorAll(".neuron-button");
+
+        neuronButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const layerIndex = button.getAttribute("data-layerIndex");
+                const neuronIndex = button.getAttribute("data-neuronIndex");
+                createOperationButtons(layerIndex, neuronIndex);
+            });
+        });
+
+        function createOperationButtons(layerIndex, neuronIndex) {
+            const container = document.getElementById("operation-buttons-container");
+
+            container.innerHTML = "";
+
+            const operations = ["PROD", "SUM", "MAX", "MIN"];
+            operations.forEach((operation) => {
+                const operationButton = document.createElement("button");
+                operationButton.type = "submit";
+                operationButton.name = "operation";
+                operationButton.value = operation;
+                operationButton.textContent = operation;
+                container.appendChild(operationButton);
+            });
+        }
+
+        const updateButton = document.getElementById("update-button");
+        updateButton.addEventListener("click", function () {
+           const layerIndex = parseInt(document.getElementById("layer-index-input").value);
+        const newXValue = parseFloat(document.getElementById("new-x-input").value);
+        const newWValue = parseFloat(document.getElementById("new-w-input").value);
+
+            const xNodes = document.querySelectorAll(`[data-layerIndex="${layerIndex}"] [data-field="x"]`);
+            const wNodes = document.querySelectorAll(`[data-layerIndex="${layerIndex}"] [data-field="w"]`);
+
+            xNodes.forEach((node) => {
+                node.textContent = newXValue;
+            });
+
+            wNodes.forEach((node) => {
+                node.textContent = newWValue;
+            });
+
+            updateHiddenInputs(layerIndex, newXValue, newWValue);
+        });
+
+        function updateHiddenInputs(layerIndex, newXValue, newWValue) {
+            const inputX = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[].x"]`);
+            const inputW = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[].w"]`);
+
+            if (inputX && inputW) {
+                inputX.value = newXValue;
+                inputW.value = newWValue;
+            }
+        }
+    });
+</script>
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const incrementButtons = document.querySelectorAll(".increment-button");
+        const decrementButtons = document.querySelectorAll(".decrement-button");
+
+        incrementButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const field = button.getAttribute("data-field");
+                const layerIndex = button.getAttribute("data-layerIndex");
+                const neuronIndex = button.getAttribute("data-neuronIndex");
+                const span = document.querySelector(`[data-field="${field}"][data-layerIndex="${layerIndex}"][data-neuronIndex="${neuronIndex}"]`);
+                let currentValue = parseFloat(span.textContent.replace(',', '.')) || 0;
+                currentValue += 0.01;
+                const newValue = currentValue.toFixed(2).replace('.', ',');
+                span.textContent = newValue;
+                updateHiddenInput(field, layerIndex, neuronIndex, currentValue);
+            });
+        });
+
+        decrementButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+                const field = button.getAttribute("data-field");
+                const layerIndex = button.getAttribute("data-layerIndex");
+                const neuronIndex = button.getAttribute("data-neuronIndex");
+                const span = document.querySelector(`[data-field="${field}"][data-layerIndex="${layerIndex}"][data-neuronIndex="${neuronIndex}"]`);
+                let currentValue = parseFloat(span.textContent.replace(',', '.')) || 0;
+                currentValue -= 0.01;
+                const newValue = currentValue.toFixed(2).replace('.', ',');
+                span.textContent = newValue;
+                updateHiddenInput(field, layerIndex, neuronIndex, currentValue);
+            });
+        });
+
+        function updateHiddenInput(field, layerIndex, neuronIndex, value) {
+            const inputX = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[${neuronIndex}].x"]`);
+            const inputW = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[${neuronIndex}].w"]`);
+            inputX.value = field === 'x' ? value : inputX.value;
+            inputW.value = field === 'w' ? value : inputW.value;
+        }
+        const updateButton = document.getElementById("update-button");
+        updateButton.addEventListener("click", function () {
+            const layerIndex = /* specify the desired layer index */;
+            const newValues = /* specify the new values for x and w */;
+
+            // Update the x and w values for all neurons in the specified layer
+            const neurons = document.querySelectorAll(`[data-layerIndex="${layerIndex}"] [data-field="x"], [data-layerIndex="${layerIndex}"] [data-field="w"]`);
+            neurons.forEach((node, index) => {
+                node.textContent = newValues[index];
+            });
+
+            // Update the hidden input fields for the form submission (if necessary)
+            updateHiddenInputs(layerIndex, newValues);
+        });
+
+        // Function to update the hidden input fields (assuming you have input fields with appropriate names)
+        function updateHiddenInputs(layerIndex, newValues) {
+            const inputX = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[].x"]`);
+            const inputW = document.querySelector(`input[name="inputs[${layerIndex}].Neurons[].w"]`);
+
+            // Assuming newValues is an array of new x and w values
+            if (inputX && inputW && newValues.length >= 2) {
+                inputX.value = newValues[0];
+                inputW.value = newValues[1];
+            }
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const neuronButtons = document.querySelectorAll(".neuron-button");
+    const hiddenLayerIndex = document.getElementById("hiddenLayerIndex");
+    const hiddenNeuronIndex = document.getElementById("hiddenNeuronIndex");
+
+    neuronButtons.forEach((button) => {
+        button.addEventListener("click", function () {
+            const layerIndex = button.getAttribute("data-layerIndex");
+            const neuronIndex = button.getAttribute("data-neuronIndex");
+
+
+            hiddenLayerIndex.value = layerIndex;
+            hiddenNeuronIndex.value = neuronIndex;
+
+            const message = `Clicked Neuron - Layer Index: ${layerIndex}, Neuron Index: ${neuronIndex}`;
+            console.log(message);
+        });
+    });
+});
+
+</script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const incrementButtons = document.querySelectorAll(".incrementt-button");
+            const decrementButtons = document.querySelectorAll(".decrementt-button");
+
+            incrementButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    const field = button.getAttribute("data-field");
+                    incrementDecrement(field, 0.01);
+                });
+            });
+
+            decrementButtons.forEach((button) => {
+                button.addEventListener("click", function () {
+                    const field = button.getAttribute("data-field");
+                    incrementDecrement(field, -0.01);
+                });
+            });
+
+            function incrementDecrement(field, step) {
+                const currentValue = parseFloat(document.querySelector(`#${field}Value`).textContent.replace(',', '.'));
+                const newValue = (currentValue + step).toFixed(2).replace('.', ',');
+                document.querySelector(`#${field}Value`).textContent = newValue;
+                updateHiddenInput(field, newValue);
+            }
+
+            function updateHiddenInput(field, value) {
+                document.querySelector(`input[name="${field}"]`).value = value;
+            }
+
+        });
+    </script>
+
+
+

@@ -1,0 +1,55 @@
+﻿@model Project2_InteligentaArtificiala_.Models.LayerModelView
+
+@{
+    ViewData["Title"] = "Configure Neural Network";
+}
+
+<h2>Configure Neural Network</h2>
+
+<form asp-action="ConfigureNetwork" method="post">
+    <div class="form-group">
+        <label for="numLayers">Number of Layers:</label>
+        <input type="number" class="form-control" id="numLayers" name="numLayers" required />
+    </div>
+
+    <div id="neuronsInputContainer">
+        <!-- Neurons input fields will be added here dynamically -->
+    </div>
+
+    <button type="button" class="btn btn-primary" id="addLayerButton">Add Layer</button>
+    <button type="submit" class="btn btn-success">Configure Network</button>
+</form>
+
+@section scripts {
+    <style>
+        .neuron-input {
+            margin-left: 20px;
+        }
+    </style>
+
+    <script>
+        var layersAdded = false; // Flag to track if layers are added
+
+        document.getElementById('addLayerButton').addEventListener('click', function () {
+            if (!layersAdded) {
+                var numLayers = parseInt(document.getElementById('numLayers').value);
+                if (!isNaN(numLayers) && numLayers > 0) {
+                    for (var i = 1; i <= numLayers; i++) {
+                        var inputField = document.createElement('div');
+                        inputField.classList.add('form-group', 'neuron-input');
+                        var layerNumber = i === 1 ? 'input' : i === numLayers ? 'output' : i;
+                        inputField.innerHTML = '<label for="neuronsForLayer' + i + '">Neurons for Layer ' + layerNumber + ':</label>' +
+                            '<input type="number" class="form-control" id="neuronsForLayer' + i + '" name="neuronsPerLayer" required />';
+                        document.getElementById('neuronsInputContainer').appendChild(inputField);
+                    }
+
+                    layersAdded = true;
+                    document.getElementById('addLayerButton').disabled = true;
+                }
+                else {
+                    alert("Please enter a valid number of layers.");
+                }
+            }
+        });
+    </script>
+}
