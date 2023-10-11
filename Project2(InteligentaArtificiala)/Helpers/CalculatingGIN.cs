@@ -18,14 +18,14 @@ namespace Project2_InteligentaArtificiala_.Helpers
             return sum;
         }
 
-        public static double PROD(List<NeuronModelView> neurons)
+        public static string PROD(List<NeuronModelView> neurons)
         {
             double prod = 1.0;
             foreach (var neuron in neurons)
             {
                 prod *= neuron.x * neuron.w;
             }
-            return prod;
+            return prod.ToString("0.000000000000000000000000");
         }
 
         public static double MAX(List<NeuronModelView> neurons)

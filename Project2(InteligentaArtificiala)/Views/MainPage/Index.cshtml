@@ -6,7 +6,7 @@
 
 <h2>Configure Neural Network</h2>
 
-<form asp-action="ConfigureNetwork" method="post">
+<form asp-action="ConfigureNetwork" asp-controller ="MainPage">
     <div class="form-group">
         <label for="numLayers">Number of Layers:</label>
         <input type="number" class="form-control" id="numLayers" name="numLayers" required />
@@ -33,13 +33,13 @@
         document.getElementById('addLayerButton').addEventListener('click', function () {
             if (!layersAdded) {
                 var numLayers = parseInt(document.getElementById('numLayers').value);
-                if (!isNaN(numLayers) && numLayers > 0) {
+                if (!isNaN(numLayers) && numLayers >= 2) { // Check if numLayers is greater than or equal to 2
                     for (var i = 1; i <= numLayers; i++) {
                         var inputField = document.createElement('div');
                         inputField.classList.add('form-group', 'neuron-input');
                         var layerNumber = i === 1 ? 'input' : i === numLayers ? 'output' : i;
                         inputField.innerHTML = '<label for="neuronsForLayer' + i + '">Neurons for Layer ' + layerNumber + ':</label>' +
-                            '<input type="number" class="form-control" id="neuronsForLayer' + i + '" name="neuronsPerLayer" required />';
+                            '<input type="number" class="form-control" id="neuronsForLayer' + i + '" name="neuronsPerLayer" required min="1" />';
                         document.getElementById('neuronsInputContainer').appendChild(inputField);
                     }
 
@@ -47,9 +47,10 @@
                     document.getElementById('addLayerButton').disabled = true;
                 }
                 else {
-                    alert("Please enter a valid number of layers.");
+                    alert("Number of layers must be greater than or equal to 2. There must be an input layer and an output layer.");
                 }
             }
         });
     </script>
+
 }

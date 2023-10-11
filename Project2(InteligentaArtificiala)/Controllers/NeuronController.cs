@@ -11,34 +11,34 @@ namespace Project2_InteligentaArtificiala_.Controllers
         {
             return View();
         }
-        [HttpPost]
-        public IActionResult CalculateGIN(int layerIndex, int neuronIndex, string operation)
-        {
-            var neuron = LayerModelView.Layer[layerIndex][neuronIndex];
-            double operationResult = 0.0;
+        //[HttpPost]
+        //public IActionResult CalculateGIN(int layerIndex, int neuronIndex, string operation)
+        //{
+        //    var neuron = LayerModelView.Layer[layerIndex][neuronIndex];
+        //    double operationResult = 0.0;
 
-            switch (operation)
-            {
-                case "SUM":
-                    operationResult = CalculatingGIN.SUM(LayerModelView.Layer[layerIndex]);
-                    break;
-                case "PROD":
-                    operationResult = CalculatingGIN.PROD(LayerModelView.Layer[layerIndex]);
-                    break;
-                case "MAX":
-                    operationResult = CalculatingGIN.MAX(LayerModelView.Layer[layerIndex]);
-                    break;
-                case "MIN":
-                    operationResult = CalculatingGIN.MIN(LayerModelView.Layer[layerIndex]);
-                    break;
-                default:
-                    // Handle the default case if necessary
-                    break;
-            }
+        //    switch (operation)
+        //    {
+        //        case "SUM":
+        //            operationResult = CalculatingGIN.SUM(LayerModelView.Layer[layerIndex]);
+        //            break;
+        //        case "PROD":
+        //            operationResult = CalculatingGIN.PROD(LayerModelView.Layer[layerIndex]);
+        //            break;
+        //        case "MAX":
+        //            operationResult = CalculatingGIN.MAX(LayerModelView.Layer[layerIndex]);
+        //            break;
+        //        case "MIN":
+        //            operationResult = CalculatingGIN.MIN(LayerModelView.Layer[layerIndex]);
+        //            break;
+        //        default:
+        //            // Handle the default case if necessary
+        //            break;
+        //    }
 
-            ViewBag.GINResult = operationResult;
-            return View("ConfigureNetwork");
-        }
+        //    ViewBag.GINResult = operationResult;
+        //    return View("ConfigureNetwork");
+        //}
 
 
 
@@ -83,6 +83,7 @@ namespace Project2_InteligentaArtificiala_.Controllers
             }
 
             ViewBag.Activation = result;
+            ViewBag.Function = NeuronModelView.function;
             NeuronModelView.Activation = result;
             NeuronModelView.a = a;
             NeuronModelView.g = g;
@@ -139,5 +140,6 @@ namespace Project2_InteligentaArtificiala_.Controllers
             ViewBag.OutputResult = NeuronModelView.OutputResult;
             return View("Index");
         }
+
     }
 }

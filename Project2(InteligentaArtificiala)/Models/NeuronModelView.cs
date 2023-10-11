@@ -3,6 +3,7 @@
     public class NeuronModelView
     {
         public static List<InputModelView> Inputs { get; set; } = new List<InputModelView>();
+        public List<double> Weights { get; set; }
         public static double GIN { get; set; }
         public int Id { get; set; }
         public double x { get; set; }
@@ -12,6 +13,7 @@
         public static double a = 1;
         public static double theta = 0;
         public static string function;
+        public static string operationFunction;
         private static int currentId = 0;
         public static int currentLayerID {  get; set; }
         public static int currentNeuronID { get; set; }

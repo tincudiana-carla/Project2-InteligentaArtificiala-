@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Project2_InteligentaArtificiala_.Helpers;
 using Project2_InteligentaArtificiala_.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 namespace Project2_InteligentaArtificiala_.Controllers
@@ -49,29 +47,54 @@ namespace Project2_InteligentaArtificiala_.Controllers
                     if(neuronIndex == 0 && layerIndex == 0)
                     {
                         operationResult = CalculatingGIN.SUM(LayerModelView.Layer[NeuronModelView.currentLayerID]);
+                        NeuronModelView.operationFunction = "SUM";
+                        ViewBag.GINResult = operationResult;
                     }
-                    else { operationResult = CalculatingGIN.SUM(LayerModelView.Layer[layerIndex]); }
+                    else { operationResult = CalculatingGIN.SUM(LayerModelView.Layer[layerIndex]);
+                        NeuronModelView.operationFunction = "SUM";
+                        ViewBag.GINResult = operationResult;
+                    }
                     break;
                 case "PROD":
                     if (neuronIndex == 0 && layerIndex == 0)
                     {
-                        operationResult = CalculatingGIN.PROD(LayerModelView.Layer[NeuronModelView.currentLayerID]);
+                        string stringOperationResult = CalculatingGIN.PROD(LayerModelView.Layer[NeuronModelView.currentLayerID]);
+                        operationResult = double.Parse(stringOperationResult);
+                        NeuronModelView.operationFunction = "PROD";
+                        ViewBag.GINResult = stringOperationResult;
                     }
-                    else { operationResult = CalculatingGIN.PROD(LayerModelView.Layer[layerIndex]); }
+                    else {
+                        string stringOperationResult = CalculatingGIN.PROD(LayerModelView.Layer[layerIndex]);
+                        operationResult = double.Parse(stringOperationResult);
+                        NeuronModelView.operationFunction = "PROD";
+                        ViewBag.GINResult = operationResult;
+                    }
+                    string result = operationResult.ToString("F20");
+
                     break;
                 case "MAX":
                     if (neuronIndex == 0 && layerIndex == 0)
                     {
                         operationResult = CalculatingGIN.MAX(LayerModelView.Layer[NeuronModelView.currentLayerID]);
+                        NeuronModelView.operationFunction = "MAX";
+                        ViewBag.GINResult = operationResult;
                     }
-                    else { operationResult = CalculatingGIN.MAX(LayerModelView.Layer[layerIndex]); }
+                    else { operationResult = CalculatingGIN.MAX(LayerModelView.Layer[layerIndex]);
+                        NeuronModelView.operationFunction = "MAX";
+                        ViewBag.GINResult = operationResult;
+                    }
                     break;
                 case "MIN":
                     if (neuronIndex == 0 && layerIndex == 0)
                     {
                         operationResult = CalculatingGIN.MIN(LayerModelView.Layer[NeuronModelView.currentLayerID]);
+                        NeuronModelView.operationFunction = "MIN";
+                        ViewBag.GINResult = operationResult;
                     }
-                    else { operationResult = CalculatingGIN.MIN(LayerModelView.Layer[layerIndex]); }
+                    else { operationResult = CalculatingGIN.MIN(LayerModelView.Layer[layerIndex]);
+                        NeuronModelView.operationFunction = "MIN";
+                        ViewBag.GINResult = operationResult;
+                    }
                     
                     break;
                 default:
@@ -79,10 +102,11 @@ namespace Project2_InteligentaArtificiala_.Controllers
                     break;
             }
 
-            ViewBag.GINResult = operationResult;
+            
             NeuronModelView.GIN = operationResult;
             NeuronModelView.currentNeuronID = neuronIndex;
             NeuronModelView.currentLayerID = layerIndex;
+            Update();
             return View("ConfigureNetwork");
 
         }
@@ -98,18 +122,23 @@ namespace Project2_InteligentaArtificiala_.Controllers
             {
                 case "Step":
                     activationResult = CalculatingActivation.Step(NeuronModelView.GIN);
+                    NeuronModelView.function = function;
                     break;
                 case "Sigmoid":
                     activationResult = CalculatingActivation.Sigmoid(NeuronModelView.GIN, g, theta);
+                    NeuronModelView.function = function;
                     break;
                 case "Sign":
                     activationResult = CalculatingActivation.Sign(NeuronModelView.GIN);
+                    NeuronModelView.function = function;
                     break;
                 case "Tanh":
                     activationResult = double.Parse(CalculatingActivation.Tanh(NeuronModelView.GIN, g, theta));
+                    NeuronModelView.function = function;
                     break;
                 case "LinearRamp":
                     activationResult = CalculatingActivation.LinearRamp(NeuronModelView.GIN, g);
+                     NeuronModelView.function = function;
                     break;
                 default:
                     break;
@@ -117,6 +146,7 @@ namespace Project2_InteligentaArtificiala_.Controllers
             NeuronModelView.Activation = activationResult;
             NeuronModelView.function = function;
             ViewBag.Activation = activationResult;
+            Update();
             return View("ConfigureNetwork");
         }
         [HttpPost]
@@ -150,16 +180,8 @@ namespace Project2_InteligentaArtificiala_.Controllers
             }
 
             NeuronModelView.OutputResult = result;
-            if(layerIndex != LayerModelView.Layer.Count-1) 
-            {
-                var nextLayerNeurons = LayerModelView.Layer[layerIndex + 1];
-                foreach(var neuron in nextLayerNeurons)
-                {
-                    neuron.x = result;
-                }
-            }
-            Update();
             ViewBag.OutputResult = result;
+            Update();
             return View("ConfigureNetwork");
         }
 
@@ -178,13 +200,11 @@ namespace Project2_InteligentaArtificiala_.Controllers
                     string xKey = $"neurons[{layerIndex}][{neuronIndex}].x";
                     string wKey = $"neurons[{layerIndex}][{neuronIndex}].w";
 
-                    // Initialize values to the current neuron values before parsing
                     double updatedXValue = neuron.x;
                     double updatedWValue = neuron.w;
 
                     if (form.TryGetValue(xKey, out var xValues) && form.TryGetValue(wKey, out var wValues))
                     {
-                        // Convert StringValues to string and replace commas with dots
                         string xString = xValues.ToString().Replace(',', '.');
                         string wString = wValues.ToString().Replace(',', '.');
 
@@ -199,15 +219,11 @@ namespace Project2_InteligentaArtificiala_.Controllers
                         }
                     }
 
-
-                    // Update neuron values without rounding
-                    neuron.x = updatedXValue;
-                    neuron.w = updatedWValue;
-
+                    neuron.x = Math.Round(updatedXValue, 13);
+                    neuron.w = Math.Round(updatedWValue, 6); 
                     neuronIndex++;
                 }
             }
-
             return View("ConfigureNetwork");
         }
 
@@ -219,6 +235,7 @@ namespace Project2_InteligentaArtificiala_.Controllers
             NeuronModelView.a = a;
             NeuronModelView.g = g;
             NeuronModelView.theta = theta;
+              Update();
             return View("ConfigureNetwork");
         }
         [HttpPost]
@@ -226,18 +243,25 @@ namespace Project2_InteligentaArtificiala_.Controllers
         {
             NeuronModelView.OutputResult = NeuronModelView.Activation;
             int layerIndex = NeuronModelView.currentLayerID;
-            if (layerIndex != LayerModelView.Layer.Count - 1)
-            {
-                var nextLayerNeurons = LayerModelView.Layer[layerIndex + 1];
-                foreach (var neuron in nextLayerNeurons)
-                {
-                    neuron.x =  NeuronModelView.OutputResult;
-                }
-            }
             Update();
             ViewBag.OutputResult = NeuronModelView.OutputResult;
             return View("ConfigureNetwork");
         }
+        [HttpPost]
+        public IActionResult SetNeuronX(int layerIndex, int neuronIndex)
+        {
+            LayerModelView.Layer[layerIndex][neuronIndex].x = NeuronModelView.OutputResult;
+            Update(); 
+            return View("ConfigureNetwork"); 
+        }
+
+        public IActionResult GetTheFunctions(int layerIndex)
+        {
+            ViewBag.Functions = NeuronModelView.function;
+            ViewBag.operationFunctions = NeuronModelView.operationFunction;
+            return View("ConfigureNetwork");
+        }
+
 
     }
 }
